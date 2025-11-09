@@ -34,19 +34,19 @@ async function DashboardContent() {
   );
 }
 
+const LoadingSkeleton = () => (
+  <div className="p-8">
+    <div className="animate-pulse">
+      <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+    </div>
+  </div>
+);
+
 export default function Page() {
   return (
-    <Suspense
-      fallback={
-        <div className="p-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
-            <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingSkeleton />}>
       <DashboardContent />
     </Suspense>
   );
