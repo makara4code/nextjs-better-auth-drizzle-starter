@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth-utils";
+import { Suspense } from "react";
 
-export default async function Page() {
+async function HomeContent() {
   const session = await getSession();
 
   return (
@@ -39,5 +40,26 @@ export default async function Page() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+          <div className="w-full max-w-md text-center space-y-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <HomeContent />
+    </Suspense>
   );
 }
