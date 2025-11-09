@@ -2,18 +2,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth-utils";
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 async function HomeContent() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
+  const session = await getSession();
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
