@@ -20,6 +20,7 @@ import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
 
 export function LoginForm({
   className,
@@ -28,26 +29,40 @@ export function LoginForm({
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [password, setPasswrod] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<any>();
+  const [errors, setErrors] = useState<{ message?: string }>();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Clear previous errors
+    setErrors(undefined);
+
     setLoading(true);
-    const { error } = await authClient.signIn.email({
-      email: email,
-      password: password,
-    });
-    setLoading(false);
 
-    if (error) {
-      setErrors(error);
-      return;
+    try {
+      const { error } = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      if (error) {
+        setErrors(error);
+        return;
+      }
+
+      // Success - redirect to dashboard
+      router.push("/dashboard");
+      router.refresh(); // Refresh server components
+    } catch (err) {
+      console.error("Login error:", err);
+      setErrors({
+        message: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
-
-    router.push("/dashboard");
   };
 
   return (
@@ -62,7 +77,7 @@ export function LoginForm({
         <CardContent>
           <form onSubmit={handleLogin}>
             {errors?.message && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="mb-4">
                 <AlertTitle>{errors.message}</AlertTitle>
               </Alert>
             )}
@@ -75,35 +90,41 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  autoComplete="email"
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
+                  <Link
+                    href="/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <Input
                   id="password"
                   type="password"
                   required
-                  onChange={(e) => setPasswrod(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  autoComplete="current-password"
                 />
               </Field>
               <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Loading..." : "Login"}
-                </Button>
-                <Button variant="outline" type="button">
-                  Login with Google
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Signing in..." : "Login"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account?{" "}
+                  <Link href="/signup" className="underline">
+                    Sign up
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
